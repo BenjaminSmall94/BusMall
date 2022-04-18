@@ -16,6 +16,17 @@ function Product(name, fileExtension = '.jpg') {
   products.push(this);
 }
 
+function fillProductArray() {
+  let productNames = ['bag', 'banana', 'bathroom', 'boots', 'breakfast', 'bubblegum', 'chair', 'cthulhu', 'dog-dock', 'dragon', 'pen', 'pet-sweep', 'scissors', 'shark', 'sweep', 'tauntaun', 'unicorn', 'water-can', 'wineglass']
+  for(let i = 0; i < productNames.length, i++) {
+    if(i !== 14) {
+      new Product(productNames[i]);
+    } else {
+      new Product(productNames[i], 'png');
+    }
+  }
+}
+
 /*Events/Handlers
     Image Selection Listeners
     Button Listener
