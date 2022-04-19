@@ -2,25 +2,36 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link href="css/reset.css" rel="stylesheet" type="text/css">
+  <link href="css/style.css" rel="stylesheet" type="text/css">
   <title>Bus Mall Survey</title>
 </head>
 <body>
-  <header>
-    <hgroup>
-      <h1>Bus Mall Survey</h1>
-      <h2>What Products Interest You?</h2>
-    </hgroup>
-  </header>
-  <main>
-    <section id="img-container">
-      <img src="" alt="">
-      <img src="" alt="">
-      <img src="" alt="">
-    </section>
-    <div id="btn">Show Results</div>
-  </main>
-  <footer>
+  <div id="wrapper">
+    <header>
+      <hgroup>
+        <h1>Bus Mall Survey</h1>
+        <h2>What Products Interest You?</h2>
+      </hgroup>
+    </header>
+    <hr>
+    <main>
+      <h2>Choose Your Favorite Product</h2>
+      <h3>Rounds Remaining: <span id="rounds-remaining">25</span></h3>
+      <section id="img-container">
+        <img src="" alt="" id="img-one">
+        <img src="" alt="" id="img-two">
+        <img src="" alt="" id="img-three">
+      </section>
+      <div id="btn"></div>
+      <table id="results-container">
 
-  </footer>
+      </table>
+    </main>
+    <footer>
+
+    </footer>
+    <script src="js/app.js"></script>
+  </div>
 </body>
 </html>
