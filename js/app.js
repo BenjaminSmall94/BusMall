@@ -5,19 +5,20 @@
 const products = [];
 const numOfPics = 3;
 const beenSeen = [];
-let votingRounds = 25;
+const totalVotingRounds = 5;
+let currentVotingRounds = totalVotingRounds;
 
 // ******* DOM References ***********
 
 const imgContainer = document.getElementById('img-container');
-const imageElements = [document.getElementById('img-one'), document.getElementById('img-two'), document.getElementById('img-three')];
+const imageElements = createImageElements(numOfPics);
 const roundsRemainingEl = document.getElementById('rounds-remaining');
 const resultsButton = document.getElementById('btn');
 const resultsContainer = document.getElementById('results-container');
 
 // ************ Main ****************
 
-roundsRemainingEl.textContent = votingRounds;
+roundsRemainingEl.textContent = currentVotingRounds;
 resultsButton.style.display = 'none';
 fillProductArray();
 renderPics(numOfPics);
@@ -36,11 +37,11 @@ function handleImgClick(e) {
       break;
     }
   }
-  roundsRemainingEl.textContent = --votingRounds;
-  if(votingRounds !== 0) {
+  roundsRemainingEl.textContent = --currentVotingRounds;
+  if(currentVotingRounds !== 0) {
     renderPics(numOfPics);
   } else {
-    removePics();
+    hidePics();
     imgContainer.removeEventListener('click', handleImgClick);
     resultsButton.addEventListener('click', handleButtonClick);
     resultsButton.style.display = 'Flex';
@@ -52,6 +53,7 @@ function handleButtonClick() {
   resultsButton.removeEventListener('click', handleButtonClick);
   resultsButton.textContent = 'Reset';
   let firstRow = document.createElement("tr");
+  firstRow.className = 'firstRow';
   buildFirstRow(firstRow);
   resultsContainer.appendChild(firstRow);
   for(let i = 0; i < products.length; i++) {
@@ -59,7 +61,35 @@ function handleButtonClick() {
     buildBodyRow(row, products[i]);
     resultsContainer.appendChild(row);
   }
-  document.getElementById("wrapper").style.height = '100%';
+  let lastRow = document.createElement("tr");
+  lastRow.className = 'lastRow';
+  buildLastRow(lastRow);
+  resultsContainer.appendChild(lastRow);
+  resultsButton.addEventListener('click', reset);
+}
+
+function reset() {
+  resultsButton.removeEventListener('click', reset);
+  resetData();
+  resetPage();
+  unhidePics();
+  renderPics(numOfPics);
+  imgContainer.addEventListener('click', handleImgClick);
+}
+
+function resetData() {
+  currentVotingRounds = totalVotingRounds;
+  for(let i = 0; i < products.length; i++) {
+    products[i].views = 0;
+    products[i].clicks = 0;
+    beenSeen[i] = false;
+  }
+}
+
+function resetPage() {
+  resultsButton.style.display = 'none';
+  resultsContainer.innerHTML = '';
+  roundsRemainingEl.textContent = currentVotingRounds;
 }
 
 function buildBodyRow(row, product) {
@@ -94,7 +124,39 @@ function buildFirstRow(firstRow) {
   firstRow.appendChild(percentClickedHeader);
 }
 
+function buildLastRow(lastRow) {
+  let totalClicks = 0;
+  let totalViews = 0;
+  for(let i = 0; i < products.length; i++) {
+    totalClicks += products[i].clicks;
+    totalViews += products[i].views;
+  }
+  let rowLabel = document.createElement('th');
+  let totalClicksEl = document.createElement('th');
+  let totalViewsEl = document.createElement('th');
+  let totalPercentEl = document.createElement('th');
+  rowLabel.textContent = 'Total';
+  totalClicksEl.textContent = totalClicks;
+  totalViewsEl.textContent = totalViews;
+  totalPercentEl.textContent = (totalClicks / totalViews * 100).toFixed(1);
+  lastRow.appendChild(rowLabel);
+  lastRow.appendChild(totalClicksEl);
+  lastRow.appendChild(totalViewsEl);
+  lastRow.appendChild(totalPercentEl);
+}
+
+
 // *************** Functions *****************
+
+function createImageElements(numOfPics) {
+  let imageElements = [];
+  for(let i = 0; i < numOfPics; i++) {
+    let currImage = document.createElement('img');
+    imgContainer.appendChild(currImage);
+    imageElements.push(currImage);
+  }
+  return imageElements;
+}
 
 function generateIndices(numOfPics) {
   const randomIndices = [];
@@ -124,11 +186,17 @@ function renderPics(numOfPics) {
   }
 }
 
-function removePics() {
+function hidePics() {
   for(let i = 0; i < imageElements.length; i++) {
     imageElements[i].src = '';
     imageElements[i].alt = '';
     imageElements[i].style.display = 'none';
+  }
+}
+
+function unhidePics() {
+  for(let i = 0; i < imageElements.length; i++) {
+    imageElements[i].style.display = 'inline';
   }
 }
 

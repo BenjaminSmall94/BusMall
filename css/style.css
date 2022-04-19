@@ -5,7 +5,6 @@ body {
 
 body > div {
   width: 960px;
-  height: 638px;
   background-color: rgba(202,218,232,91);
   font-family: sans-serif;
   margin: auto;
@@ -47,7 +46,7 @@ img {
   height: 300px;
   border: 2px solid black;
   border-radius: 15px;
-  margin: 0px 3px;
+  margin: 3px 3px;
 }
 
 /* https://www.codesdope.com/blog/article/adding-outline-to-text-using-css/ */
@@ -71,11 +70,18 @@ table {
   margin: 10px auto;
   background-color: rgba(202, 232, 231, 91);
   border: 2px solid black;
-  margin-bottom: 20px;
 }
 
 th, td {
   border: 1px solid black;
+}
+
+.firstRow {
+  border-bottom: 2px solid black;
+}
+
+.lastRow {
+  border-top: 2px solid black;
 }
 
 th, td {
