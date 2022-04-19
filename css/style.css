@@ -1,0 +1,89 @@
+body {
+  background: rgb(216, 230, 234);
+  margin: 0px;
+}
+
+body > div {
+  width: 960px;
+  height: 638px;
+  background-color: rgba(202,218,232,91);
+  font-family: sans-serif;
+  margin: auto;
+  border: 2px solid black;
+}
+
+header, main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1 {
+  font-size: 36pt;
+  margin: 20px;
+}
+
+h2 {
+  font-size: 24pt;
+  margin: 15px;
+}
+
+h3 {
+  font-size: 18pt;
+  margin: 15px;
+}
+
+hgroup {
+  text-align: center;
+}
+
+hr {
+  border: 1px solid black;
+  width: 880px;
+}
+
+img {
+  width: 300px;
+  height: 300px;
+  border: 2px solid black;
+  border-radius: 15px;
+  margin: 0px 3px;
+}
+
+/* https://www.codesdope.com/blog/article/adding-outline-to-text-using-css/ */
+#btn {
+  width: 100px;
+  height:50px;
+  background-color:rgb(240, 182, 128);
+  color: white;
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
+  font-weight: bold;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid black;
+  border-radius: 10px;
+  font-size: 13.5pt;
+}
+
+table {
+  margin: 10px auto;
+  background-color: rgba(202, 232, 231, 91);
+  border: 2px solid black;
+  margin-bottom: 20px;
+}
+
+th, td {
+  border: 1px solid black;
+}
+
+th, td {
+  width: 78px;
+  text-align: center;
+  padding: 2px;
+}
+
+th {
+  font-weight: bold;
+}
