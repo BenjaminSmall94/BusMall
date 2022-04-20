@@ -3,15 +3,16 @@
 // ******* Global Variables *********
 
 const products = [];
-const numOfPics = 3;
+const numOfPics = 4;
 const beenSeen = [];
-const totalVotingRounds = 5;
+const totalVotingRounds = 25;
+let randomIndices = [];
 let currentVotingRounds = totalVotingRounds;
 
 // ******* DOM References ***********
 
 const imgContainer = document.getElementById('img-container');
-const imageElements = createImageElements(numOfPics);
+const imageElements = createImageElements();
 const roundsRemainingEl = document.getElementById('rounds-remaining');
 const resultsButton = document.getElementById('btn');
 const resultsContainer = document.getElementById('results-container');
@@ -21,7 +22,7 @@ const resultsContainer = document.getElementById('results-container');
 roundsRemainingEl.textContent = currentVotingRounds;
 resultsButton.style.display = 'none';
 fillProductArray();
-renderPics(numOfPics);
+chooseRenderPics();
 
 // ************ Events **************
 
@@ -39,7 +40,8 @@ function handleImgClick(e) {
   }
   roundsRemainingEl.textContent = --currentVotingRounds;
   if(currentVotingRounds !== 0) {
-    renderPics(numOfPics);
+    chooseRenderPics();
+    randomIndices = randomIndices.slice(numOfPics);
   } else {
     hidePics();
     imgContainer.removeEventListener('click', handleImgClick);
@@ -73,7 +75,8 @@ function reset() {
   resetData();
   resetPage();
   unhidePics();
-  renderPics(numOfPics);
+  chooseRenderPics();
+  randomIndices = randomIndices.slice(numOfPics);
   imgContainer.addEventListener('click', handleImgClick);
 }
 
@@ -138,7 +141,7 @@ function buildLastRow(lastRow) {
   rowLabel.textContent = 'Total';
   totalClicksEl.textContent = totalClicks;
   totalViewsEl.textContent = totalViews;
-  totalPercentEl.textContent = (totalClicks / totalViews * 100).toFixed(1);
+  totalPercentEl.textContent = (totalClicks / totalViews * 100).toFixed(1) + '%';
   lastRow.appendChild(rowLabel);
   lastRow.appendChild(totalClicksEl);
   lastRow.appendChild(totalViewsEl);
@@ -148,7 +151,7 @@ function buildLastRow(lastRow) {
 
 // *************** Functions *****************
 
-function createImageElements(numOfPics) {
+function createImageElements() {
   let imageElements = [];
   for(let i = 0; i < numOfPics; i++) {
     let currImage = document.createElement('img');
@@ -158,8 +161,7 @@ function createImageElements(numOfPics) {
   return imageElements;
 }
 
-function generateIndices(numOfPics) {
-  const randomIndices = [];
+function generateIndices() {
   for(let i = 0; i < numOfPics; i++) {
     let randomIndex = randomInRange(0, products.length - 1);
     if(!beenSeen.includes(false)) {
@@ -174,15 +176,22 @@ function generateIndices(numOfPics) {
     }
     randomIndices.push(randomIndex);
   }
-  return randomIndices;
 }
 
-function renderPics(numOfPics) {
-  const randomIndices = generateIndices(numOfPics);
+function chooseRenderPics() {
+  generateIndices();
+  if(randomIndices.length <= numOfPics) {
+    renderPics();
+  } else {
+    renderPics(numOfPics);
+  }
+}
+
+function renderPics(numOfPics = 0) {
   for(let i = 0; i < imageElements.length; i++) {
-    imageElements[i].src = products[randomIndices[i]].URL;
-    imageElements[i].alt = products[randomIndices[i]].productName;
-    products[randomIndices[i]].views++;
+    imageElements[i].src = products[randomIndices[i + numOfPics]].URL;
+    imageElements[i].alt = products[randomIndices[i + numOfPics]].productName;
+    products[randomIndices[i + numOfPics]].views++;
   }
 }
 
