@@ -19,12 +19,23 @@
       <h2>Choose Your Favorite Product</h2>
       <h3>Rounds Remaining: <span id="rounds-remaining">25</span></h3>
       <section id="img-container">
-
+        
       </section>
-      <div id="btn"></div>
       <table id="results-container">
 
       </table>
+      <form id="round-info">
+        <div>
+          <label>Number of Rounds</label>
+          <input type="number" name="rounds" min="1" step="1">
+        </div>
+        <div>
+          <label>Number of Pictures</label>
+          <input type="number" name="numPics" min="2" max="9" step="1">
+        </div>
+        <button>Reset</button>
+      </form>
+      <div id="btn">View Results</div>
       <canvas id="chart-holder"></canvas>
     </main>
     <footer>
