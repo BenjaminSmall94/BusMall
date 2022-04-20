@@ -2,33 +2,45 @@
 
 // ******* Global Variables *********
 
-const products = [];
-const numOfPics = 3;
+
 const beenSeen = [];
-const totalVotingRounds = 25;
+let products = [];
 let randomIndices = [];
+let totalVotingRounds = 25;
 let currentVotingRounds = totalVotingRounds;
+let prevNumOfPics = 0;
+let numOfPics = 3;
 let myChart;
 
 // ******* DOM References ***********
 
-const imgContainer = document.getElementById('img-container');
-const imageElements = createImageElements();
 const roundsRemainingEl = document.getElementById('rounds-remaining');
 const resultsButton = document.getElementById('btn');
 const resultsContainer = document.getElementById('results-container');
+const form = document.getElementById('round-info');
 const ctx = document.getElementById('chart-holder');
+const imgContainer = document.getElementById('img-container');
+let imageElements = createImageElements();
+
+// ******** Local Storage ***********
+
+let retrievedProducts = localStorage.getItem('products');
+let parsedProducts = JSON.parse(retrievedProducts);
 
 // ************ Main ****************
 
+if(retrievedProducts) {
+  products = parsedProducts;
+} else {
+  fillProductArray();
+}
 roundsRemainingEl.textContent = currentVotingRounds;
-resultsButton.style.display = 'none';
-fillProductArray();
-chooseRenderPics();
+chooseRenderPics(0);
 
 // ************ Events **************
 
 imgContainer.addEventListener('click', handleImgClick);
+form.addEventListener('submit', reset);
 
 // ************ Handlers ************
 
@@ -43,49 +55,63 @@ function handleImgClick(e) {
   roundsRemainingEl.textContent = --currentVotingRounds;
   if(currentVotingRounds !== 0) {
     chooseRenderPics();
-    randomIndices = randomIndices.slice(numOfPics);
   } else {
-    hidePics();
-    imgContainer.removeEventListener('click', handleImgClick);
+    imgContainer.innerHTML = '';
     resultsButton.addEventListener('click', handleButtonClick);
-    resultsButton.style.display = 'Flex';
-    resultsButton.textContent = 'View Results';
+    form.style.display = 'none';
+    resultsButton.style.display = 'flex';
   }
 }
 
 function handleButtonClick() {
   resultsButton.removeEventListener('click', handleButtonClick);
-  resultsButton.textContent = 'Reset';
+  resultsContainer.style.display = 'block';
+  form.style.display = 'flex';
+  resultsButton.style.display = 'none';
   buildFirstRow();
   buildMainDisplays();
   buildLastRow();
-  resultsButton.addEventListener('click', reset);
+  localStorage.setItem('products', JSON.stringify(products));
+  console.log(products);
 }
 
-function reset() {
-  resultsButton.removeEventListener('click', reset);
+function reset(e) {
+  e.preventDefault();
   resetData();
+  updateNums(e);
   resetPage();
-  unhidePics();
   chooseRenderPics();
-  randomIndices = randomIndices.slice(numOfPics);
-  imgContainer.addEventListener('click', handleImgClick);
+}
+
+function updateNums(e) {
+  let photoNumInput = parseInt(e.target.numPics.value);
+  let roundNumInput = parseInt(e.target.rounds.value);
+  if(!isNaN(photoNumInput) && photoNumInput >= 2 && photoNumInput <= 9) {
+    numOfPics = photoNumInput;
+  }
+  if(!isNaN(roundNumInput) && roundNumInput > 0) {
+    totalVotingRounds = roundNumInput;
+  }
+  currentVotingRounds = totalVotingRounds;
 }
 
 function resetData() {
-  currentVotingRounds = totalVotingRounds;
   for(let i = 0; i < products.length; i++) {
-    products[i].views = 0;
-    products[i].clicks = 0;
+    // products[i].views = 0;
+    // products[i].clicks = 0;
     beenSeen[i] = false;
   }
 }
 
 function resetPage() {
-  resultsButton.style.display = 'none';
   resultsContainer.innerHTML = '';
+  imgContainer.innerHTML = '';
+  imageElements = createImageElements();
+  resultsContainer.style.display = 'none';
   roundsRemainingEl.textContent = currentVotingRounds;
-  myChart.destroy();
+  if(myChart) {
+    myChart.destroy();
+  }
   ctx.style.display = 'none';
 }
 
@@ -101,8 +127,7 @@ function buildMainDisplays() {
     productVotes.push(products[i].clicks);
     productViews.push(products[i].views);
   }
-  let currChart = new ChartObj('bar', productNames, productVotes, productViews);
-  myChart = new Chart(ctx, currChart);
+  myChart = new Chart(ctx, new ChartObj('bar', productNames, productVotes, productViews));
   ctx.style.display = 'block';
 }
 
@@ -114,10 +139,10 @@ function ChartObj(type, productNames, productVotes, productViews) {
       label: 'Votes',
       data: productVotes,
       backgroundColor: [
-        'blue'
+        'white'
       ],
       borderColor: [
-        'blue'
+        'black'
       ],
       borderWidth: 1
     },
@@ -239,35 +264,15 @@ function generateIndices() {
   }
 }
 
-function chooseRenderPics() {
+function chooseRenderPics(prev = prevNumOfPics) {
   generateIndices();
-  if(randomIndices.length <= numOfPics) {
-    renderPics();
-  } else {
-    renderPics(numOfPics);
+  for(let i = 0; i < numOfPics; i++) {
+    imageElements[i].src = products[randomIndices[i + prev]].URL;
+    imageElements[i].alt = products[randomIndices[i + prev]].productName;
+    products[randomIndices[i + prev]].views++;
   }
-}
-
-function renderPics(numOfPics = 0) {
-  for(let i = 0; i < imageElements.length; i++) {
-    imageElements[i].src = products[randomIndices[i + numOfPics]].URL;
-    imageElements[i].alt = products[randomIndices[i + numOfPics]].productName;
-    products[randomIndices[i + numOfPics]].views++;
-  }
-}
-
-function hidePics() {
-  for(let i = 0; i < imageElements.length; i++) {
-    imageElements[i].src = '';
-    imageElements[i].alt = '';
-    imageElements[i].style.display = 'none';
-  }
-}
-
-function unhidePics() {
-  for(let i = 0; i < imageElements.length; i++) {
-    imageElements[i].style.display = 'inline';
-  }
+  randomIndices = randomIndices.slice(prevNumOfPics);
+  prevNumOfPics = numOfPics;
 }
 
 function Product(name, fileExtension = '.jpg') {
