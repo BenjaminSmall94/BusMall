@@ -2,8 +2,9 @@
 
 // ******* Global Variables *********
 
-const products = [];
+
 const beenSeen = [];
+let products = [];
 let randomIndices = [];
 let totalVotingRounds = 25;
 let currentVotingRounds = totalVotingRounds;
@@ -21,10 +22,19 @@ const ctx = document.getElementById('chart-holder');
 const imgContainer = document.getElementById('img-container');
 let imageElements = createImageElements();
 
+// ******** Local Storage ***********
+
+let retrievedProducts = localStorage.getItem('products');
+let parsedProducts = JSON.parse(retrievedProducts);
+
 // ************ Main ****************
 
+if(retrievedProducts) {
+  products = parsedProducts;
+} else {
+  fillProductArray();
+}
 roundsRemainingEl.textContent = currentVotingRounds;
-fillProductArray();
 chooseRenderPics(0);
 
 // ************ Events **************
@@ -61,21 +71,19 @@ function handleButtonClick() {
   buildFirstRow();
   buildMainDisplays();
   buildLastRow();
+  localStorage.setItem('products', JSON.stringify(products));
+  console.log(products);
 }
 
 function reset(e) {
   e.preventDefault();
-  resetData(e);
+  resetData();
+  updateNums(e);
   resetPage();
   chooseRenderPics();
 }
 
-function resetData(e) {
-  for(let i = 0; i < products.length; i++) {
-    products[i].views = 0;
-    products[i].clicks = 0;
-    beenSeen[i] = false;
-  }
+function updateNums(e) {
   let photoNumInput = parseInt(e.target.numPics.value);
   let roundNumInput = parseInt(e.target.rounds.value);
   if(!isNaN(photoNumInput) && photoNumInput >= 2 && photoNumInput <= 9) {
@@ -85,6 +93,14 @@ function resetData(e) {
     totalVotingRounds = roundNumInput;
   }
   currentVotingRounds = totalVotingRounds;
+}
+
+function resetData() {
+  for(let i = 0; i < products.length; i++) {
+    // products[i].views = 0;
+    // products[i].clicks = 0;
+    beenSeen[i] = false;
+  }
 }
 
 function resetPage() {
