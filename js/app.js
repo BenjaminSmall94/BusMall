@@ -3,11 +3,12 @@
 // ******* Global Variables *********
 
 const products = [];
-const numOfPics = 4;
+const numOfPics = 3;
 const beenSeen = [];
 const totalVotingRounds = 25;
 let randomIndices = [];
 let currentVotingRounds = totalVotingRounds;
+let myChart;
 
 // ******* DOM References ***********
 
@@ -16,6 +17,7 @@ const imageElements = createImageElements();
 const roundsRemainingEl = document.getElementById('rounds-remaining');
 const resultsButton = document.getElementById('btn');
 const resultsContainer = document.getElementById('results-container');
+const ctx = document.getElementById('chart-holder');
 
 // ************ Main ****************
 
@@ -54,19 +56,9 @@ function handleImgClick(e) {
 function handleButtonClick() {
   resultsButton.removeEventListener('click', handleButtonClick);
   resultsButton.textContent = 'Reset';
-  let firstRow = document.createElement("tr");
-  firstRow.className = 'firstRow';
-  buildFirstRow(firstRow);
-  resultsContainer.appendChild(firstRow);
-  for(let i = 0; i < products.length; i++) {
-    let row = document.createElement('tr');
-    buildBodyRow(row, products[i]);
-    resultsContainer.appendChild(row);
-  }
-  let lastRow = document.createElement("tr");
-  lastRow.className = 'lastRow';
-  buildLastRow(lastRow);
-  resultsContainer.appendChild(lastRow);
+  buildFirstRow();
+  buildMainDisplays();
+  buildLastRow();
   resultsButton.addEventListener('click', reset);
 }
 
@@ -93,12 +85,67 @@ function resetPage() {
   resultsButton.style.display = 'none';
   resultsContainer.innerHTML = '';
   roundsRemainingEl.textContent = currentVotingRounds;
+  myChart.destroy();
+  ctx.style.display = 'none';
 }
 
-function buildBodyRow(row, product) {
-  let productNameElem = document.createElement("th");
-  let clicksElem = document.createElement("td");
-  let viewsElem = document.createElement("td");
+function buildMainDisplays() {
+  let productNames = [];
+  let productVotes = [];
+  let productViews = [];
+  for(let i = 0; i < products.length; i++) {
+    let row = document.createElement('tr');
+    renderBodyRow(row, products[i]);
+    resultsContainer.appendChild(row);
+    productNames.push(products[i].productName);
+    productVotes.push(products[i].clicks);
+    productViews.push(products[i].views);
+  }
+  let currChart = new ChartObj('bar', productNames, productVotes, productViews);
+  myChart = new Chart(ctx, currChart);
+  ctx.style.display = 'block';
+}
+
+function ChartObj(type, productNames, productVotes, productViews) {
+  this.type = type;
+  this.data = {
+    labels: productNames,
+    datasets: [{
+      label: 'Votes',
+      data: productVotes,
+      backgroundColor: [
+        'blue'
+      ],
+      borderColor: [
+        'blue'
+      ],
+      borderWidth: 1
+    },
+    {
+      label: 'Views',
+      data: productViews,
+      backgroundColor: [
+        'black'
+      ],
+      borderColor: [
+        'black'
+      ],
+      borderWidth: 1
+    }]
+  };
+  this.options = {
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  };
+}
+
+function renderBodyRow(row, product) {
+  let productNameElem = document.createElement('th');
+  let clicksElem = document.createElement('td');
+  let viewsElem = document.createElement('td');
   let percentElem = document.createElement('td');
   productNameElem.textContent = product.productName;
   clicksElem.textContent = product.clicks;
@@ -112,11 +159,18 @@ function buildBodyRow(row, product) {
   row.appendChild(percentElem);
 }
 
-function buildFirstRow(firstRow) {
-  let nameHeader = document.createElement("th");
-  let clickHeader = document.createElement("th");
-  let viewHeader = document.createElement("th");
-  let percentClickedHeader = document.createElement("th");
+function buildFirstRow() {
+  let firstRow = document.createElement('tr');
+  firstRow.className = 'firstRow';
+  renderFirstRow(firstRow);
+  resultsContainer.appendChild(firstRow);
+}
+
+function renderFirstRow(firstRow) {
+  let nameHeader = document.createElement('th');
+  let clickHeader = document.createElement('th');
+  let viewHeader = document.createElement('th');
+  let percentClickedHeader = document.createElement('th');
   nameHeader.textContent = 'Name';
   clickHeader.textContent = 'Clicks';
   viewHeader.textContent = 'Views';
@@ -127,7 +181,14 @@ function buildFirstRow(firstRow) {
   firstRow.appendChild(percentClickedHeader);
 }
 
-function buildLastRow(lastRow) {
+function buildLastRow() {
+  let lastRow = document.createElement('tr');
+  lastRow.className = 'lastRow';
+  renderLastRow(lastRow);
+  resultsContainer.appendChild(lastRow);
+}
+
+function renderLastRow(lastRow) {
   let totalClicks = 0;
   let totalViews = 0;
   for(let i = 0; i < products.length; i++) {
